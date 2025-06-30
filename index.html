@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedometer Digital - Ukur Kecepatan Kendaraan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .speedometer-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .speedometer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 35, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 8px solid rgba(255,255,255,0.1);
+        }
+
+        .speed-display {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .speed-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.7);
+            margin-bottom: 5px;
+        }
+
+        .speed-unit {
+            font-size: 1.5rem;
+            color: #7fdbff;
+            opacity: 0.8;
+        }
+
+        .needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 130px;
+            background: linear-gradient(to top, #ff4d4d, #ff1a1a);
+            border-radius: 4px;
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%) rotate(0deg);
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(255,0,0,0.5);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            background: #ff1a1a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+            box-shadow: 0 0 10px rgba(255,0,0,0.8);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .vehicle-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .vehicle-btn.active {
+            background: rgba(0, 150, 255, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 150, 255, 0.5);
+        }
+
+        .vehicle-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .status-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #7fdbff;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 120px;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #ffcc00;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .instructions h2 {
+            margin-bottom: 15px;
+            color: #7fdbff;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        .accuracy-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .error-message {
+            background: rgba(200, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Animasi untuk speedometer */
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px rgba(0, 200, 255, 0.7); }
+            50% { text-shadow: 0 0 20px rgba(0, 200, 255, 1); }
+            100% { text-shadow: 0 0 10px rgba(0, 200, 255, 0.7); }
+        }
+
+        /* Responsif */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .subtitle { font-size: 1rem; }
+            .speedometer-container { width: 250px; height: 250px; }
+            .speed-value { font-size: 3rem; }
+            .vehicle-btn { padding: 10px 15px; }
+            .stat-box { min-width: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-tachometer-alt"></i> Speedometer Digital</h1>
+        <p class="subtitle">Ukur kecepatan kendaraan secara real-time dan akurat</p>
+    </header>
+
+    <div class="container">
+        <div class="speedometer-container">
+            <div class="speedometer">
+                <div class="speed-display">
+                    <div class="speed-value">0</div>
+                    <div class="speed-unit">km/h</div>
+                </div>
+                <div class="needle"></div>
+                <div class="center-circle"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="vehicle-btn active" data-vehicle="bicycle">
+                <i class="fas fa-bicycle"></i> Sepeda
+            </button>
+            <button class="vehicle-btn" data-vehicle="motorcycle">
+                <i class="fas fa-motorcycle"></i> Motor
+            </button>
+            <button class="vehicle-btn" data-vehicle="car">
+                <i class="fas fa-car"></i> Mobil
+            </button>
+            <button class="vehicle-btn" data-vehicle="train">
+                <i class="fas fa-train"></i> Kereta
+            </button>
+        </div>
+
+        <div class="status">
+            <h2 class="status-title">Status Kendaraan</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="max-speed">0</div>
+                    <div class="stat-label">Kecepatan Maks (km/h)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="avg-speed">0</div>
+                    <div class="stat-label">Rata-rata (km/h)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="distance">0</div>
+                    <div class="stat-label">Jarak (m)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="altitude">0</div>
+                    <div class="stat-label">Ketinggian (m)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2><i class="fas fa-info-circle"></i> Cara Penggunaan</h2>
+            <ol>
+                <li>Izinkan akses lokasi saat browser meminta persetujuan</li>
+                <li>Pilih jenis kendaraan yang sedang Anda gunakan</li>
+                <li>Mulai bergerak - speedometer akan menampilkan kecepatan secara real-time</li>
+                <li>Kecepatan maks dan rata-rata akan dihitung secara otomatis</li>
+            </ol>
+            <p class="accuracy-info">
+                <i class="fas fa-exclamation-triangle"></i> Akurasi bergantung pada perangkat dan sinyal GPS. 
+                Hasil terbaik diperoleh di area terbuka.
+            </p>
+        </div>
+
+        <div class="error-message" id="error-message">
+            Error: Akses lokasi tidak diizinkan atau tidak tersedia. Mohon periksa pengaturan browser Anda.
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2023 Speedometer Digital | Dibuat dengan HTML, CSS & JavaScript
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elemen UI
+            const speedValue = document.querySelector('.speed-value');
+            const needle = document.querySelector('.needle');
+            const maxSpeedElement = document.getElementById('max-speed');
+            const avgSpeedElement = document.getElementById('avg-speed');
+            const distanceElement = document.getElementById('distance');
+            const altitudeElement = document.getElementById('altitude');
+            const vehicleButtons = document.querySelectorAll('.vehicle-btn');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Variabel state
+            let maxSpeed = 0;
+            let totalSpeed = 0;
+            let speedCount = 0;
+            let totalDistance = 0;
+            let lastPosition = null;
+            let currentVehicle = 'bicycle';
+            let watchId = null;
+            
+            // Inisialisasi tombol kendaraan
+            vehicleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Hapus kelas aktif dari semua tombol
+                    vehicleButtons.forEach(btn => btn.classList.remove('active'));
+                    // Tambahkan kelas aktif ke tombol yang diklik
+                    this.classList.add('active');
+                    // Perbarui kendaraan saat ini
+                    currentVehicle = this.getAttribute('data-vehicle');
+                });
+            });
+            
+            // Fungsi untuk mengupdate speedometer
+            function updateSpeedometer(speed) {
+                // Konversi m/s ke km/h
+                const speedKmh = Math.round(speed * 3.6);
+                
+                // Update tampilan kecepatan
+                speedValue.textContent = speedKmh;
+                
+                // Hitung rotasi jarum (0 km/h = -135°, 240 km/h = 135°)
+                const rotation = Math.min(Math.max((speedKmh / 240) * 270 - 135, -135), 135);
+                needle.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
+                
+                // Animasi pulsa untuk kecepatan tinggi
+                if (speedKmh > 100) {
+                    speedValue.style.animation = 'pulse 0.5s infinite';
+                } else {
+                    speedValue.style.animation = 'none';
+                }
+                
+                // Update statistik
+                if (speedKmh > maxSpeed) {
+                    maxSpeed = speedKmh;
+                    maxSpeedElement.textContent = maxSpeed;
+                }
+                
+                totalSpeed += speedKmh;
+                speedCount++;
+                avgSpeedElement.textContent = Math.round(totalSpeed / speedCount);
+                
+                return speedKmh;
+            }
+            
+            // Fungsi untuk menghitung jarak antara dua koordinat (Haversine formula)
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371e3; // Radius bumi dalam meter
+                const φ1 = lat1 * Math.PI/180;
+                const φ2 = lat2 * Math.PI/180;
+                const Δφ = (lat2-lat1) * Math.PI/180;
+                const Δλ = (lon2-lon1) * Math.PI/180;
+                
+                const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                          Math.cos(φ1) * Math.cos(φ2) *
+                          Math.sin(Δλ/2) * Math.sin(Δλ/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                
+                return R * c; // Jarak dalam meter
+            }
+            
+            // Fungsi untuk memulai pemantauan lokasi
+            function startSpeedometer() {
+                if (watchId !== null) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+                
+                watchId = navigator.geolocation.watchPosition(
+                    position => {
+                        errorMessage.style.display = 'none';
+                        
+                        // Dapatkan kecepatan (dalam m/s)
+                        let speed = position.coords.speed;
+                        
+                        // Jika kecepatan tidak tersedia, hitung berdasarkan perbedaan posisi
+                        if (speed === null || speed < 0) {
+                            if (lastPosition) {
+                                const timeDiff = (position.timestamp - lastPosition.timestamp) / 1000; // dalam detik
+                                if (timeDiff > 0) {
+                                    const distance = calculateDistance(
+                                        lastPosition.coords.latitude,
+                                        lastPosition.coords.longitude,
+                                        position.coords.latitude,
+                                        position.coords.longitude
+                                    );
+                                    speed = distance / timeDiff;
+                                    
+                                    // Akumulasi jarak
+                                    totalDistance += distance;
+                                    distanceElement.textContent = Math.round(totalDistance);
+                                }
+                            }
+                        } else {
+                            // Jika kecepatan tersedia langsung dari sensor
+                            const distance = speed * 1; // asumsi pembaruan setiap 1 detik
+                            totalDistance += distance;
+                            distanceElement.textContent = Math.round(totalDistance);
+                        }
+                        
+                        // Update ketinggian
+                        if (position.coords.altitude) {
+                            altitudeElement.textContent = Math.round(position.coords.altitude);
+                        }
+                        
+                        // Update speedometer
+                        if (speed !== null && speed >= 0) {
+                            updateSpeedometer(speed);
+                        }
+                        
+                        // Simpan posisi saat ini untuk perhitungan berikutnya
+                        lastPosition = position;
+                    },
+                    error => {
+                        console.error('Error getting location:', error);
+                        errorMessage.style.display = 'block';
+                        speedValue.textContent = '0';
+                        needle.style.transform = 'translate(-50%, -100%) rotate(-135deg)';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        maximumAge: 0,
+                        timeout: 5000
+                    }
+                );
+            }
+            
+            // Meminta izin lokasi dan memulai speedometer
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    () => startSpeedometer(),
+                    error => {
+                        console.error('Location permission denied:', error);
+                        errorMessage.style.display = 'block';
+                    }
+                );
+            } else {
+                errorMessage.textContent = 'Geolocation tidak didukung oleh browser Anda.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
